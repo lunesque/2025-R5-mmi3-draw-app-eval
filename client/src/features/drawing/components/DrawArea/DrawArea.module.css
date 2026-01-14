@@ -9,4 +9,5 @@
   box-sizing: border-box;
   width: var(--width);
   height: var(--height);
+  background-color: white;
 }
