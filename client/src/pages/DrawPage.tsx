@@ -22,7 +22,7 @@ function DrawPage() {
           {/* <Instructions>
             {getInstructions('user-list')}
           </Instructions> */}
-          <UserList users={userList} />
+          <UserList users={userList}/>
         </>
       }
       bottomArea={

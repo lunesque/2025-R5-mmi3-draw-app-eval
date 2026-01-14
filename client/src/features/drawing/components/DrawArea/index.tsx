@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { getCoordinatesRelativeToElement } from "../../utils/getCanvasCoordinates";
 import { useMyUserStore } from "../../../user/store/useMyUserStore";
+import { useUserListStore } from "../../../user/store/useUserListStore";
 import styles from './DrawArea.module.css';
 import { SocketManager } from "../../../../shared/services/SocketManager";
 import type { DrawStroke, Point } from "../../../../shared/types/drawing.type";
@@ -37,7 +38,10 @@ export function DrawArea() {
   
   const { myUser } = useMyUserStore();
   const canUserDraw = useMemo(() => myUser !== null, [myUser]); 
-  
+
+  const { userListDrawing, setUserListDrawing } = useUserListStore();
+  const usersDrawing = useRef<Map<string, "drawing" | "not drawing">>(new Map());
+
   /**
   * ===================
   * GESTION COORDONNEES
@@ -137,6 +141,11 @@ export function DrawArea() {
       
       SocketManager.emit('draw:end');
       
+      /** Mettre à jour le store quand l'utilisateur arrêt de dessiner*/
+      usersDrawing.current.set(myUser.id, "not drawing");
+      setUserListDrawing(usersDrawing.current);
+      console.log(usersDrawing.current);
+
       canvasRef.current.removeEventListener('mousemove', onMouseMove);
       canvasRef.current.removeEventListener('mouseup', onMouseUp);
     }, [onMouseMove]);
@@ -144,7 +153,7 @@ export function DrawArea() {
     
     const onMouseDown: React.MouseEventHandler<HTMLCanvasElement> = useCallback((e) => {
       /** On empêche à l'utilisateur de dessiner tant qu'il n'a pas rejoint le serveur  */
-      if (!canUserDraw) { return; }
+      if (!canUserDraw) { return; }      
       
       /** Récupération du contexte 2d du canvas */ 
       const canvas = e.currentTarget;
@@ -164,6 +173,10 @@ export function DrawArea() {
         strokeWidth: 3,
         color: 'black'
       });
+
+      /** Mettre à jour le store quand l'utilisateur commence de dessiner*/
+      usersDrawing.current.set(myUser.id, "drawing");
+      setUserListDrawing(usersDrawing.current);
       
       /**
       * On pourrait ajouter le onMouseMove, onMouseUp directement dans le JSX de notre canvas, mais les ajouter à la volée ici est plus flexible. On pourra retirer ces events onMouseUp
@@ -239,6 +252,9 @@ export function DrawArea() {
     
     const onOtherUserDrawEnd = useCallback((payload: DrawStroke) => {
       otherUserStrokes.current.delete(payload.userId);
+      
+      /** Mettre à jour le store quand un autre utilisateur arrêt de dessiner*/
+      usersDrawing.current.set(payload.userId, "not drawing");
     }, []);
     
     const getAllStrokes = useCallback(() => {
@@ -256,6 +272,10 @@ export function DrawArea() {
       drawOtherUserPoints(payload.userId, payload.points);
       
       otherUserStrokes.current.set(payload.userId, payload.points);
+
+      /** Mettre à jour le store quand un autre utilisateur commence de dessiner*/
+      usersDrawing.current.set(payload.userId, "drawing");
+      setUserListDrawing(usersDrawing.current);
     }, [drawOtherUserPoints]);
     
     

@@ -19,6 +19,8 @@ export function UserList({ users }: UserListProps){
               <div>
                 <div className="text-xs uppercase font-semibold">{user.username}</div>
               </div>
+              {/* Affiche l'indicateur si l'utilisateur est en train de dessiner */}
+              <div className="badge badge-soft badge-info">dessine?</div>
             </li>
           ))
         :
