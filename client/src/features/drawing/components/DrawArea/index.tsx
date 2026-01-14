@@ -39,8 +39,7 @@ export function DrawArea() {
   const { myUser } = useMyUserStore();
   const canUserDraw = useMemo(() => myUser !== null, [myUser]); 
 
-  const { userListDrawing, setUserListDrawing } = useUserListStore();
-  const usersDrawing = useRef<Map<string, "drawing" | "not drawing">>(new Map());
+  const { setUserListDrawing } = useUserListStore();
 
   /**
   * ===================
@@ -141,10 +140,9 @@ export function DrawArea() {
       
       SocketManager.emit('draw:end');
       
-      /** Mettre à jour le store quand l'utilisateur arrêt de dessiner*/
-      usersDrawing.current.set(myUser.id, "not drawing");
-      setUserListDrawing(usersDrawing.current);
-      console.log(usersDrawing.current);
+      /** Mettre à jour le liste des utilisateurs en train de dessiner quand l'utilisateur arrêt de dessiner*/
+      if (!myUser) return;
+      setUserListDrawing(myUser.id, "not drawing");
 
       canvasRef.current.removeEventListener('mousemove', onMouseMove);
       canvasRef.current.removeEventListener('mouseup', onMouseUp);
@@ -174,9 +172,9 @@ export function DrawArea() {
         color: 'black'
       });
 
-      /** Mettre à jour le store quand l'utilisateur commence de dessiner*/
-      usersDrawing.current.set(myUser.id, "drawing");
-      setUserListDrawing(usersDrawing.current);
+      /** Mettre à jour le liste des utilisateurs en train de dessiner quand l'utilisateur commence de dessiner*/
+      if (!myUser) return;
+      setUserListDrawing(myUser.id, "drawing");
       
       /**
       * On pourrait ajouter le onMouseMove, onMouseUp directement dans le JSX de notre canvas, mais les ajouter à la volée ici est plus flexible. On pourra retirer ces events onMouseUp
@@ -253,8 +251,8 @@ export function DrawArea() {
     const onOtherUserDrawEnd = useCallback((payload: DrawStroke) => {
       otherUserStrokes.current.delete(payload.userId);
       
-      /** Mettre à jour le store quand un autre utilisateur arrêt de dessiner*/
-      usersDrawing.current.set(payload.userId, "not drawing");
+      /** Mettre à jour le liste des utilisateurs en train de dessiner quand un autre utilisateur arrêt de dessiner*/
+      setUserListDrawing(payload.userId, "not drawing");
     }, []);
     
     const getAllStrokes = useCallback(() => {
@@ -273,9 +271,8 @@ export function DrawArea() {
       
       otherUserStrokes.current.set(payload.userId, payload.points);
 
-      /** Mettre à jour le store quand un autre utilisateur commence de dessiner*/
-      usersDrawing.current.set(payload.userId, "drawing");
-      setUserListDrawing(usersDrawing.current);
+      /** Mettre à jour le liste des utilisateurs en train de dessiner quand un autre utilisateur commence de dessiner*/
+      setUserListDrawing(payload.userId, "drawing");
     }, [drawOtherUserPoints]);
     
     

@@ -1,3 +1,5 @@
+import { useUserListStore } from "../../store/useUserListStore";
+
 export type UserListProps = {
   users: {
     id: string;
@@ -7,6 +9,8 @@ export type UserListProps = {
 }
 
 export function UserList({ users }: UserListProps){
+  const { userListDrawing } = useUserListStore();
+
   return (
     <div className="flex flex-col gap-3">
       <span className="font-bold">Liste des utilisateurs: <div className="badge badge-soft badge-info">{users.length}</div></span>
@@ -19,8 +23,8 @@ export function UserList({ users }: UserListProps){
               <div>
                 <div className="text-xs uppercase font-semibold">{user.username}</div>
               </div>
-              {/* Affiche l'indicateur si l'utilisateur est en train de dessiner */}
-              <div className="badge badge-soft badge-info">dessine?</div>
+              {/* Récuperer si l'utilisateur est en train de dessiner ou pas, si oui, afficher l'indicateur */}
+              {userListDrawing.get(user.id) == "drawing" ? (<div className="badge badge-soft badge-info">dessine</div>) : null}
             </li>
           ))
         :
