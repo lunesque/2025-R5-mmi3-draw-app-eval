@@ -14,7 +14,7 @@ import { relativeToAbsoluteCoordinates } from "../../utils/relativeToAbsoluteCoo
 * ResizeObserver : https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver
 */
 
-export function DrawArea() {
+export function DrawArea({ canvasRef }) {
   /**
   * ===================
   * ETATS & REFS (toujours les définir en haut du composant)
@@ -31,7 +31,6 @@ export function DrawArea() {
   * On utilise des refs ici, car on ne veut surtout pas provoquer de re-render à chaque fois qu'on a une modification de tracé
   * Ici, on va donc pouvoir stocker les informations dont on a besoin, sans provoquer aucun re-rendu
   */
-  const canvasRef = useRef<HTMLCanvasElement>(null); /** Les updates sur ces constantes ne provoqueront pas re-render */
   const parentRef = useRef<HTMLDivElement>(null); /** Les updates sur ces constantes ne provoqueront pas re-render */
   
   const otherUserStrokes = useRef<Map<string, Point[]>>(new Map());

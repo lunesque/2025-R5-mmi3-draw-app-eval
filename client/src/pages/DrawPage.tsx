@@ -1,16 +1,19 @@
 import { AppHeader } from '../shared/components/AppHeader/AppHeader'
 import { DrawLayout } from '../shared/components/layouts/DrawLayout/DrawLayout'
-
-import { Instructions } from '../shared/components/Instructions/Instructions'
-import { getInstructions } from '../shared/utils/get-instructions'
+// import { Instructions } from '../shared/components/Instructions/Instructions'
+// import { getInstructions } from '../shared/utils/get-instructions'
 import { UserList } from '../features/user/components/UserList'
 import { DrawArea } from '../features/drawing/components/DrawArea'
 import { useUpdatedUserList } from '../features/user/hooks/useUpdatedUserList'
 import { useJoinMyUser } from '../features/user/hooks/useJoinMyUser'
+import { useRef } from 'react'
+import { DrawToolbar } from '../features/drawing/components/DrawToolbar'
 
 function DrawPage() {
   const { joinMyUser }  = useJoinMyUser();
   const { userList } = useUpdatedUserList();
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  
 
   return (
     <DrawLayout
@@ -27,13 +30,14 @@ function DrawPage() {
       }
       bottomArea={
         <>
-          <Instructions>
+          {/* <Instructions>
             {getInstructions('toolbar')}
-          </Instructions>
+          </Instructions> */}
+          <DrawToolbar canvasRef={canvasRef}/>
         </>
       }
     >
-      <DrawArea />
+      <DrawArea canvasRef={canvasRef} />
       {/* <TestDrawArea /> */}
       {/* <Instructions className="max-w-xs">
         {getInstructions('draw-area')}

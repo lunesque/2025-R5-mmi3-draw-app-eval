@@ -1,6 +1,10 @@
 export function DrawToolbar() {
+import { DrawExportButton } from "../DrawExportButton";
+
+export function DrawToolbar({ canvasRef }) {
   return (
-    /* @todo */
-    <div></div>
+    <div className="flex">
+      <DrawExportButton canvasRef={canvasRef} />
+    </div>
   )
 }
